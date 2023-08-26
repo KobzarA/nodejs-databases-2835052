@@ -35,15 +35,16 @@ class MongoBackend {
     const documents = [];
     data.data.entries.forEach(entry => {
       documents.push({
-        data: entry[0],
+        date: entry[0],
         value: entry[1],
       });
     });
     return this.collection.insertMany(documents);
-    // console.log(documents);
   }
 
-  async getMax() {}
+  async getMax() {
+    return this.collection.findOne({}, { sort: { value: -1 } });
+  }
 
   async max() {
     console.info('Connection to MongoDB');
@@ -56,13 +57,30 @@ class MongoBackend {
     }
     console.timeEnd('mongodb-connect');
 
-    await this.insert();
+    console.info('Inserting into MongoDB');
+    console.time('mongodb-insert');
+    const insertResult = await this.insert();
+    console.timeEnd('mongodb-insert');
+
+    console.info(
+      `Inserted ${insertResult.insertedCount} documents into MongoDB`
+    );
+
+    console.info('Querying to MongoDB');
+    console.time('mongodb-find');
+    const doc = await this.getMax();
+    console.timeEnd('mongodb-find');
 
     console.info('Disconnection from MongoDB');
     console.time('mongodb-disconnect');
     await this.disconnect();
 
     console.timeEnd('mongodb-disconnect');
+
+    return {
+      date: new Date(doc.date).toDateString(),
+      value: doc.value,
+    };
   }
 }
 
