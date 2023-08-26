@@ -1,7 +1,6 @@
 {
   "name": "maxcoin",
   "version": "1.0.0",
-  "description": "",
   "main": "test.js",
   "scripts": {
     "start": "node main.js"
@@ -20,5 +19,7 @@
     "eslint-plugin-import": "^2.22.0",
     "eslint-plugin-prettier": "^3.1.4",
     "prettier": "^2.1.2"
-  }
+  },
+  "keywords": [],
+  "description": ""
 }
