@@ -8,8 +8,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/ioredis": "^5.0.0",
     "@types/mongodb": "^4.0.7",
     "axios": "^0.20.0",
+    "ioredis": "^5.3.2",
     "mongodb": "^5.8.1"
   },
   "devDependencies": {
