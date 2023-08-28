@@ -2,10 +2,13 @@ const express = require('express');
 
 const BasketService = require('../../services/BasketService');
 const ItemService = require('../../services/ItemService');
+const OrderService = require('../../services/OrderService');
+
 const config = require('../../config');
 
 module.exports = () => {
   const router = express.Router();
+  const order = new OrderService(config.mysql.client);
 
   router.get('/', async (req, res) => {
     if (!res.locals.currentUser) {
@@ -64,15 +67,13 @@ module.exports = () => {
     return res.redirect('/basket');
   });
 
-  router.get('/buy', async (req, res, next) => {
-    return next('Not implemented');
-    /*
+  router.get('/buy', async (req, res) => {
     if (!res.locals.currentUser) {
       req.session.messages.push({
-        type: "warning",
-        text: "Please log in first",
+        type: 'warning',
+        text: 'Please log in first',
       });
-      return res.redirect("/shop");
+      return res.redirect('/shop');
     }
     try {
       const userId = res.locals.currentUser.id;
@@ -84,13 +85,13 @@ module.exports = () => {
 
       // be defensive
       if (!basketItems) {
-        throw new Error("No items found in basket");
+        throw new Error('No items found in basket');
       }
 
       // Find the item for each basket entry and add the quantity to it
       // Return a new array with items plus quantity as new field
       const items = await Promise.all(
-        Object.keys(basketItems).map(async (key) => {
+        Object.keys(basketItems).map(async key => {
           const item = await ItemService.getOne(key);
           return {
             sku: item.sku,
@@ -102,32 +103,31 @@ module.exports = () => {
       );
 
       // Run this in a sequelize transaction
-      await order.inTransaction(async (t) => {
+      await order.inTransaction(async t => {
         // Create a new order and add all items
         await order.create(user, items, t);
         // Clear the users basket
         await Promise.all(
-          Object.keys(basketItems).map(async (itemId) => {
+          Object.keys(basketItems).map(async itemId => {
             await basket.remove(itemId);
           })
         );
       });
 
       req.session.messages.push({
-        type: "success",
-        text: "Thank you for your business",
+        type: 'success',
+        text: 'Thank you for your business',
       });
 
-      return res.redirect("/basket");
+      return res.redirect('/basket');
     } catch (err) {
       req.session.messages.push({
-        type: "danger",
-        text: "There was an error finishing your order",
+        type: 'danger',
+        text: 'There was an error finishing your order',
       });
       console.error(err);
-      return res.redirect("/basket");
+      return res.redirect('/basket');
     }
-    */
   });
 
   return router;
